@@ -35,10 +35,11 @@
 
 
 
-#define MAX_TRANSACTION_DOLLARS 42949671
-#define DOLLAR      (100)
-#define CENT_SIGN   "\xc2\xa2" //TODO - UTF 8 only? 
-#define NUM_DENOMINATIONS   (11)
+#define MAX_TRANSACTION_DOLLARS (42949671)
+#define DOLLAR                  (100U)
+#define MAX_CENTS               (99U)
+#define CENT_SIGN               "\xc2\xa2" //TODO - UTF 8 only? 
+#define NUM_DENOMINATIONS       (11)
 
 uint16_t denominations[NUM_DENOMINATIONS] =
         { 10000, 5000, 2000, 1000, 500, 100, //bills
@@ -82,6 +83,10 @@ int main(int argc, char* argv[]) {
     printf("[Dollars in: %u] [Cents in: %u]\n", amount.dollars, amount.cents);
 
     uint32_t total_cents = 0;
+    if (amount.cents > MAX_CENTS) {
+        printf("%u cents too large, max cents is %u\n", amount.cents, MAX_CENTS);
+        return -1;
+    }
 
     if (amount.dollars <= MAX_TRANSACTION_DOLLARS) {
         total_cents = amount.dollars * DOLLAR + amount.cents;
