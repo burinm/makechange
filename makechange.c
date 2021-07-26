@@ -59,18 +59,22 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    printf("Initalized with %d denominations:\n", NUM_DENOMINATIONS);
+    printf("[Initalized with %d denominations]\n", NUM_DENOMINATIONS);
     for (int i=0; i< NUM_DENOMINATIONS; i++) {
         if (denominations[i] >= DOLLAR) {
             //This  will be slow, but is just for test
-            printf("[%d] $%d dollar bill\n", i+1, denominations[i] / DOLLAR);
+            printf("\t(%d) $%d dollar bill\n", i+1, denominations[i] / DOLLAR);
         } else {
-            printf("[%d] %d%s coin\n", i+1, denominations[i], CENT_SIGN);
+            printf("\t(%d) %d%s coin\n", i+1, denominations[i], CENT_SIGN);
         }
     }
+    printf("\n");
 
     currency_t amount = {0,0};
     process_currency_string(argv[1], &amount);
+
+    printf("[Dollars in: %u] [Cents in: %u]\n", amount.dollars, amount.cents);
+
     uint32_t total_cents = 0;
 
     if (amount.dollars <= MAX_TRANSACTION_DOLLARS) {
@@ -85,14 +89,14 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    printf("Change:\n");
+    printf("\n[Change]\n");
     for (int i=0; i< NUM_DENOMINATIONS; i++) {
         if (change_counts[i] > 0) {
             if (denominations[i] >= DOLLAR) {
                 //This will be slow, but is just for output
-                printf("%u $%u dollar bills\n", change_counts[i], denominations[i] / DOLLAR);
+                printf("\t%u x $%u dollar bills\n", change_counts[i], denominations[i] / DOLLAR);
             } else {
-                printf("%u %u%s coin\n", change_counts[i], denominations[i], CENT_SIGN);
+                printf("\t%u x %u%s coin\n", change_counts[i], denominations[i], CENT_SIGN);
             }
         }
     } 
@@ -158,7 +162,7 @@ int process_currency_string(char* s, currency_t *c) {
     if (dollar_start) {
         c->dollars = (uint32_t)strtol(dollar_start, NULL, 10);
         if (!errno) {
-            printf("Dollars in:%d\n", c->dollars);
+            //ok
         } else {
             c->dollars = 0;
             return -1;
@@ -168,7 +172,7 @@ int process_currency_string(char* s, currency_t *c) {
     if (cent_start) {
         c->cents = (uint8_t)strtol(cent_start, NULL, 10);
         if (!errno) {
-            printf("Cents in:%d\n", c->cents);
+            //ok
         } else {
             c->cents = 0;
             return -1;
@@ -187,10 +191,12 @@ int change_checksum(uint32_t cents_in, uint32_t* currency_array) {
     }
 
     if (checksum == cents_in) {
-        printf("Checksum passed: %u (checksum) == %u (in)\n", checksum, cents_in);
+        printf("\tChecksum passed: %u (checksum) == %u (in)\n", checksum, cents_in);
         return 0;
     } else {
-        printf("Checksum failed: %u (checksum) == %u (in)\n", checksum, cents_in);
+        printf("\tChecksum failed: %u (checksum) == %u (in)\n", checksum, cents_in);
         return -1;
     }
+
+    printf("\n");
 }
