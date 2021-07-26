@@ -18,10 +18,16 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h> //malloc, free
+#include <string.h> //memset
 
 
 #define DOLLAR      (100)
-#define CENT_SIGN   '¢' //TODO - make portable
+
+/* good hint - https://stackoverflow.com/questions/23983906/printing-multi-byte-characters-in-terminal-using-c
+
+    In order to find the three bytes quickly for my post I just typed this in a python console: u"\u72d7".encode('UTF-8')
+*/
+#define CENT_SIGN   "\xc2\xa2" //TODO - UTF 8 only? 
 
 #define NUM_DENOMINATIONS   (11)
 uint16_t denominations[NUM_DENOMINATIONS] =
@@ -30,6 +36,9 @@ uint16_t denominations[NUM_DENOMINATIONS] =
 
 //Return results into this array, use same ordering as demoninations[] 
 uint32_t change_counts[NUM_DENOMINATIONS];
+
+//Count out change for cents_in
+int make_change(uint32_t cents_in);
 
 int main(int argc, char* argv[]) {
 
@@ -42,7 +51,7 @@ int main(int argc, char* argv[]) {
             //This  will be slow, but is just for test
             printf("[%d] $%d dollar bill\n", i+1, denominations[i] / DOLLAR);
         } else {
-            printf("[%d] %d%c coin\n", i+1, denominations[i], CENT_SIGN);
+            printf("[%d] %d%s coin\n", i+1, denominations[i], CENT_SIGN);
         }
     } 
 
@@ -55,7 +64,7 @@ int main(int argc, char* argv[]) {
                 //This  will be slow, but is just for output
                 printf("%d $%d dollar bills\n", change_counts[i], denominations[i] / DOLLAR);
             } else {
-                printf("%d %d%c coin\n", change_counts[i], denominations[i], CENT_SIGN);
+                printf("%d %d%s coin\n", change_counts[i], denominations[i], CENT_SIGN);
             }
         }
     } 
