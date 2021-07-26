@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h> //malloc, free
 #include <string.h> //memset
+#include <ctype.h> //isalnum
 
 
 #define DOLLAR      (100)
@@ -39,9 +40,16 @@ uint32_t change_counts[NUM_DENOMINATIONS];
 
 //Count out change for cents_in
 int make_change(uint32_t cents_in);
+int process_currency_string(char* s);
 
 int main(int argc, char* argv[]) {
 
+    if (argc != 2) {
+        printf("usage: make_change <dollars.cents>\n");
+        return 0;
+    }
+    
+    process_currency_string(argv[1]);
     
 
     printf("Initalized with %d denominations:\n", NUM_DENOMINATIONS);
@@ -89,5 +97,45 @@ int make_change(uint32_t cents_in) {
         }
     }
 
+
+}
+
+int process_currency_string(char* s) {
+    if (s == NULL) {
+        return -1;
+    }
+
+    char* dollar_start = NULL;
+    char* cent_start = NULL;
+
+    int is_cents_flag = 0;
+
+    while (*s) {
+        if (isalnum(*s)) {
+            if (is_cents_flag) { 
+                if (cent_start == NULL) {
+                    cent_start = s;
+                }
+            } else {
+                if (dollar_start == NULL) {
+                    dollar_start = s;
+                }
+            }
+        } else {
+            if (*s == '.') {
+                *s = '\0';
+                is_cents_flag = 1;
+            }
+        }
+        s++;
+    }
+
+    if (dollar_start) {
+        printf("Dollars in:%d\n", atoi(dollar_start));
+    }
+
+    if (cent_start) {
+        printf("Cents in:%d\n", atoi(cent_start));
+    }
 
 }
