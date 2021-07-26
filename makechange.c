@@ -51,6 +51,4 @@ int change_checksum(uint32_t cents_in, uint32_t* currency_array, uint16_t* denom
         printf("\tChecksum failed: %u (checksum) == %u (in)\n", checksum, cents_in);
         return -1;
     }
-
-    printf("\n");
 }
