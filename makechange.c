@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
         total_cents = amount.dollars * DOLLAR + amount.cents;
         make_change(total_cents);
     } else {
-        printf("%d.%d too large\n", amount.dollars, amount.cents);
+        printf("%u.%u too large\n", amount.dollars, amount.cents);
         return -1;
     }
 
@@ -90,9 +90,9 @@ int main(int argc, char* argv[]) {
         if (change_counts[i] > 0) {
             if (denominations[i] >= DOLLAR) {
                 //This will be slow, but is just for output
-                printf("%d $%d dollar bills\n", change_counts[i], denominations[i] / DOLLAR);
+                printf("%u $%u dollar bills\n", change_counts[i], denominations[i] / DOLLAR);
             } else {
-                printf("%d %d%s coin\n", change_counts[i], denominations[i], CENT_SIGN);
+                printf("%u %u%s coin\n", change_counts[i], denominations[i], CENT_SIGN);
             }
         }
     } 
@@ -118,7 +118,7 @@ int make_change(uint32_t cents_in) {
         }
     }
 
-
+return 0;
 }
 
 int process_currency_string(char* s, currency_t *c) {
@@ -174,6 +174,8 @@ int process_currency_string(char* s, currency_t *c) {
             return -1;
         }
     }
+
+return 0;
 }
 
 int change_checksum(uint32_t cents_in, uint32_t* currency_array) {
