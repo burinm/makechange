@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc != 2) {
-        printf("usage: make_change <dollars.cents>\n");
+        printf("usage: change <dollars.cents>\n");
         return 0;
     }
 
