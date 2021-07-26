@@ -38,14 +38,20 @@
 #include "driver.h"
 #include "makechange.h"
 
-uint16_t denominations[];
-#include "denominations.c"
-#define NUM_DENOMINATIONS (uint8_t)(sizeof(denominations) / sizeof(uint16_t))
+//These are compiled in from Makefile
+extern uint8_t NUM_DENOMINATIONS;
+extern uint16_t denominations[];
 
-//Return results into this array, use same ordering as demoninations[] 
-uint32_t change_counts[NUM_DENOMINATIONS];
 
 int main(int argc, char* argv[]) {
+
+
+    uint8_t num_denominations = NUM_DENOMINATIONS;
+
+    if (num_denominations == 0) {
+        printf("denominations not compiled into unit. <error>\n");
+        return -4;
+    }
 
     if (argc != 2) {
         printf("usage: make_change <dollars.cents>\n");
@@ -55,8 +61,11 @@ int main(int argc, char* argv[]) {
 
     //TODO - sanitize input
 
-    printf("[Initalized with %d denominations]\n", NUM_DENOMINATIONS);
-    for (int i=0; i< NUM_DENOMINATIONS; i++) {
+    //Return results into this array, use same ordering as demoninations[]
+    uint32_t change_counts[num_denominations];
+
+    printf("[Initalized with %d denominations]\n", num_denominations);
+    for (int i=0; i< num_denominations; i++) {
         if (denominations[i] >= DOLLAR) {
             //This  will be slow, but is just for test
             printf("\t(%d) $%d dollar bill\n", i+1, denominations[i] / DOLLAR);
@@ -80,20 +89,20 @@ int main(int argc, char* argv[]) {
 
     if (amount.dollars <= MAX_TRANSACTION_DOLLARS) {
         total_cents = amount.dollars * DOLLAR + amount.cents;
-        make_change(total_cents, change_counts, denominations, NUM_DENOMINATIONS);
+        make_change(total_cents, change_counts, denominations, num_denominations);
     } else {
         printf("%u.%u too large\n", amount.dollars, amount.cents);
         return -1;
     }
 
     //Check results
-    if (change_checksum(total_cents, change_counts, denominations, NUM_DENOMINATIONS) != 0) {
+    if (change_checksum(total_cents, change_counts, denominations, num_denominations) != 0) {
         return -1;
     }
 
     //All good, print out results
     printf("\n[Change]\n");
-    for (int i=0; i< NUM_DENOMINATIONS; i++) {
+    for (int i=0; i< num_denominations; i++) {
         if (change_counts[i] > 0) {
             if (denominations[i] >= DOLLAR) {
                 //This will be slow, but is just for output
