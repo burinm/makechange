@@ -37,8 +37,9 @@
 #include <errno.h> //errno
 #include "driver.h"
 #include "makechange.h"
-#include "denominations.c"
 
+uint16_t denominations[];
+#include "denominations.c"
 #define NUM_DENOMINATIONS (uint8_t)(sizeof(denominations) / sizeof(uint16_t))
 
 //Return results into this array, use same ordering as demoninations[] 
@@ -70,6 +71,7 @@ int main(int argc, char* argv[]) {
 
     printf("[Dollars in: %u] [Cents in: %u]\n", amount.dollars, amount.cents);
 
+    //Check input for overflow
     uint32_t total_cents = 0;
     if (amount.cents > MAX_CENTS) {
         printf("%u cents too large, max cents is %u\n", amount.cents, MAX_CENTS);
@@ -84,10 +86,12 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+    //Check results
     if (change_checksum(total_cents, change_counts, denominations, NUM_DENOMINATIONS) != 0) {
         return -1;
     }
 
+    //All good, print out results
     printf("\n[Change]\n");
     for (int i=0; i< NUM_DENOMINATIONS; i++) {
         if (change_counts[i] > 0) {
@@ -99,7 +103,6 @@ int main(int argc, char* argv[]) {
             }
         }
     } 
-
 
 return 0;
 }
