@@ -1,4 +1,5 @@
 /* 7/2021 - burin
+    Standard U.S currency denominations from $100 -> 1cent
 */
 
 #ifndef __DENOMINATIONS__

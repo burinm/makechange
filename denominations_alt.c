@@ -1,4 +1,5 @@
 /* 7/2021 - burin
+    U.S currency denominations from $100 -> 1cent including $2 bill
 */
 
 #ifndef __DENOMINATIONS__

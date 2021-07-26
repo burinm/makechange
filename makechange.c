@@ -1,12 +1,10 @@
 /* 7/2021 - burin
+    Algorithm to make change by subtracting largest
+    denominations first, then iterate to smaller
 */
 
-//#include <stdint.h>
 #include <stdio.h>
-//#include <stdlib.h> //malloc, free, strtol
 #include <string.h> //memset
-//#include <ctype.h> //isalnum
-//#include <errno.h> //errno
 #include "makechange.h"
 
 /*Count out change for cents_in by iterating through denominations
@@ -14,7 +12,7 @@
 */
 int make_change(uint32_t cents_in, uint32_t* change_counts, uint16_t* denominations, uint8_t num_denominations) {
 
-    memset(change_counts, 0, sizeof(uint32_t) * num_denominations); //TODO, how to verify this
+    memset(change_counts, 0, sizeof(uint32_t) * num_denominations); //TODO, verify the size
 
     for (int i=0; i< num_denominations; i++) {
         if (denominations[i] > cents_in) {

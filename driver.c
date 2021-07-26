@@ -22,12 +22,13 @@
             u"<<copy/paste cent sign here>>".encode('UTF-8')
 
     TODO: Define error handling return values (remove magic numbers)
-    TODO: Split up main/change logic into seperate compile units
-    TODO: Make denominations definitions modular
 
     Known bugs:
         input of m.n does not equal m.n0, instead is m.0n
             (example .9 = 9 cents, not 90 cents)
+
+        Not a bug perse, but '$' needs to be escaped in the shell
+            i.e., \$54.32
 */
 
 #include <stdint.h>
