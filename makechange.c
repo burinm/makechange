@@ -9,6 +9,7 @@
         Smallest denomination is a penny (.01 dollars)
         We do not have any 2 dollar bills
         Max transaction 2^32 pennies - $42949672.96 
+            Use $42949671 dollars as check (so max is $42949671.99)
 
     Also, assume this is an embedded system with no
     floating point math. So everything will be done in whole
@@ -17,11 +18,14 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h> //malloc, free
+#include <stdlib.h> //malloc, free, strtol
 #include <string.h> //memset
 #include <ctype.h> //isalnum
+#include <errno.h> //errno
 
 
+
+#define MAX_TRANSACTION_DOLLARS 42949671
 #define DOLLAR      (100)
 
 /* good hint - https://stackoverflow.com/questions/23983906/printing-multi-byte-characters-in-terminal-using-c
@@ -35,12 +39,17 @@ uint16_t denominations[NUM_DENOMINATIONS] =
         { 10000, 5000, 2000, 1000, 500, 100, //bills
           50, 25, 10 , 5, 1};                //coins 
 
+typedef struct {
+   uint32_t dollars;
+   uint8_t cents;
+} currency_t;
+
 //Return results into this array, use same ordering as demoninations[] 
 uint32_t change_counts[NUM_DENOMINATIONS];
 
 //Count out change for cents_in
 int make_change(uint32_t cents_in);
-int process_currency_string(char* s);
+int process_currency_string(char* s, currency_t *c);
 
 int main(int argc, char* argv[]) {
 
@@ -48,9 +57,6 @@ int main(int argc, char* argv[]) {
         printf("usage: make_change <dollars.cents>\n");
         return 0;
     }
-    
-    process_currency_string(argv[1]);
-    
 
     printf("Initalized with %d denominations:\n", NUM_DENOMINATIONS);
     for (int i=0; i< NUM_DENOMINATIONS; i++) {
@@ -60,15 +66,24 @@ int main(int argc, char* argv[]) {
         } else {
             printf("[%d] %d%s coin\n", i+1, denominations[i], CENT_SIGN);
         }
-    } 
+    }
 
-    make_change(1125);
+    currency_t amount = {0,0};
+    process_currency_string(argv[1], &amount);
+
+    if (amount.dollars <= MAX_TRANSACTION_DOLLARS) {
+        uint32_t total_cents = amount.dollars * DOLLAR + amount.cents;
+        make_change(total_cents);
+    } else {
+        printf("%d.%d too large\n", amount.dollars, amount.cents);
+        return -1;
+    }
 
     printf("Change:\n");
     for (int i=0; i< NUM_DENOMINATIONS; i++) {
         if (change_counts[i] > 0) {
             if (denominations[i] >= DOLLAR) {
-                //This  will be slow, but is just for output
+                //This will be slow, but is just for output
                 printf("%d $%d dollar bills\n", change_counts[i], denominations[i] / DOLLAR);
             } else {
                 printf("%d %d%s coin\n", change_counts[i], denominations[i], CENT_SIGN);
@@ -100,10 +115,13 @@ int make_change(uint32_t cents_in) {
 
 }
 
-int process_currency_string(char* s) {
-    if (s == NULL) {
-        return -1;
+int process_currency_string(char* s, currency_t *c) {
+    if (s == NULL || c == NULL) {
+        return -3;
     }
+
+    c->dollars = 0;
+    c->cents = 0;
 
     char* dollar_start = NULL;
     char* cent_start = NULL;
@@ -130,12 +148,24 @@ int process_currency_string(char* s) {
         s++;
     }
 
+
     if (dollar_start) {
-        printf("Dollars in:%d\n", atoi(dollar_start));
+        c->dollars = (uint32_t)strtol(dollar_start, NULL, 10);
+        if (!errno) {
+            printf("Dollars in:%d\n", c->dollars);
+        } else {
+            c->dollars = 0;
+            return -1;
+        }
     }
 
     if (cent_start) {
-        printf("Cents in:%d\n", atoi(cent_start));
+        c->cents = (uint8_t)strtol(cent_start, NULL, 10);
+        if (!errno) {
+            printf("Cents in:%d\n", c->cents);
+        } else {
+            c->cents = 0;
+            return -1;
+        }
     }
-
 }
