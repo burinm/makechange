@@ -50,6 +50,7 @@ uint32_t change_counts[NUM_DENOMINATIONS];
 //Count out change for cents_in
 int make_change(uint32_t cents_in);
 int process_currency_string(char* s, currency_t *c);
+int change_checksum(uint32_t cents_in, uint32_t* currency_array);
 
 int main(int argc, char* argv[]) {
 
@@ -70,12 +71,17 @@ int main(int argc, char* argv[]) {
 
     currency_t amount = {0,0};
     process_currency_string(argv[1], &amount);
+    uint32_t total_cents = 0;
 
     if (amount.dollars <= MAX_TRANSACTION_DOLLARS) {
-        uint32_t total_cents = amount.dollars * DOLLAR + amount.cents;
+        total_cents = amount.dollars * DOLLAR + amount.cents;
         make_change(total_cents);
     } else {
         printf("%d.%d too large\n", amount.dollars, amount.cents);
+        return -1;
+    }
+
+    if (change_checksum(total_cents, change_counts) != 0) {
         return -1;
     }
 
@@ -167,5 +173,22 @@ int process_currency_string(char* s, currency_t *c) {
             c->cents = 0;
             return -1;
         }
+    }
+}
+
+int change_checksum(uint32_t cents_in, uint32_t* currency_array) {
+
+    uint32_t checksum = 0;
+
+    for (int i=0; i< NUM_DENOMINATIONS; i++) {
+        checksum += denominations[i] * currency_array[i];
+    }
+
+    if (checksum == cents_in) {
+        printf("Checksum passed: %u (checksum) == %u (in)\n", checksum, cents_in);
+        return 0;
+    } else {
+        printf("Checksum failed: %u (checksum) == %u (in)\n", checksum, cents_in);
+        return -1;
     }
 }
