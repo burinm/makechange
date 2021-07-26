@@ -42,7 +42,6 @@ int make_change(uint32_t cents_in);
 
 int main(int argc, char* argv[]) {
 
-    memset(change_counts, 0, sizeof(change_counts));
     
 
     printf("Initalized with %d denominations:\n", NUM_DENOMINATIONS);
@@ -75,6 +74,7 @@ return 0;
 
 int make_change(uint32_t cents_in) {
 
+    memset(change_counts, 0, sizeof(change_counts));
     for (int i=0; i< NUM_DENOMINATIONS; i++) {
         if (denominations[i] > cents_in) {
             continue;
